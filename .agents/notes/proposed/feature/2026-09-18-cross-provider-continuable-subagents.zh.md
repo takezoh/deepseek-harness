@@ -10,11 +10,11 @@ DeepSeek Harness 已经提供 `ctx.subagents`，并支持原生可持续 child a
 
 直接需求来自 `dev-skills`。其现有 subsession 与 communication runtime 的目的，是让 role session 跨 workflow phase 存活，并在 conductor 与 delegated worker 之间传递 implementation feedback 等消息。如果继续在 DSH 外部重复实现这些机制，就会重复 DSH 已经拥有的 session、process、messaging 与 provider lifecycle 概念。
 
-因此目标不是再做一层 wrapper harness，而是让 DSH 本身可以在同一个以 main session 为中心的 subagent 模型下托管 Claude Code、Codex 与 DSH native child。
+因此目标不是在 DSH 外再做一层完整 wrapper harness，而是采用两层设计：一个 host-neutral 的 external-agent runtime core，负责 provider 原生 create/resume/send/interrupt 能力；以及一个 DSH plugin/adapter，把这些能力映射到 DSH 的 `ctx.subagents`、Session、inbox、report 与 activation semantics。DSH 仍是第一 host 与主要集成目标，但 provider-control core 不依赖 DSH，以便未来被其他 harness 复用。
 
 ## Proposal
 
-扩展 DSH，使 DSH main session 可以通过 `ctx.subagents` spawn Claude Code、Codex 或 DSH-native child，并共享统一 lifecycle：
+构建 host-neutral provider-control core 与 DSH integration，使 DSH main session 可以通过 `ctx.subagents` spawn Claude Code、Codex 或 DSH-native child，并共享统一 lifecycle：
 
 ```text
 DSH main session
@@ -37,9 +37,27 @@ DSH main session
 
 初期不要求 child-to-child 直接通信。Claude child 若需要影响 Codex child，应先经由 main session。
 
-### Runtime vocabulary
+### Runtime layering
 
-尽可能使用 DSH 原生术语。除非确认存在具体缺口，不新增第二套 `SubsessionRef`、provider registry、mailbox 或 session store。
+实现分为两层：
+
+```text
+host-neutral agent runtime core
+    |- provider session identity
+    |- create / resume / send / interrupt
+    |- capability description
+    |- native continuation adapters
+    |
+    +-- DSH plugin / adapter
+          |- ctx.subagents integration
+          |- DSH Session binding
+          |- inbox / report mapping
+          |- activation / event wiring
+```
+
+host-neutral core 不拥有 durable session store、mailbox、scheduler 或 DSH-specific lifecycle。由 DSH 承载时，逻辑 child lifetime、persistence、inbox、report、wake/resume 与 event log 仍由 DSH authoritative。
+
+在 integration boundary 上尽量使用 DSH 原生术语。除非确认存在具体缺口，不新增第二套面向 DSH 的 `SubsessionRef`、mailbox 或 session store。
 
 对 `dev-skills` 的映射为：
 
@@ -49,6 +67,23 @@ dev-skills subsession
 ```
 
 DSH child Session 表示逻辑生命周期。实际存活的 Claude Code process、Codex app-server process 或 DSH Agent activation 只是该逻辑 child 的 activation。
+
+### Host-neutral provider contract
+
+可复用 core 只暴露 host 控制 provider 原生 session 所需的最小能力：
+
+```text
+create
+resume
+send
+interrupt
+dispose
+capabilities
+```
+
+具体 API 必须同时由 Claude Code 与 Codex 的实际需求推导，而不能基于单一 provider 预先设计。core 可以持有 opaque provider session binding 与 capability metadata，但不决定 workflow policy、persistence policy 或 DSH message semantics。
+
+只要 Claude Code、Codex 与未来 ACP adapter 的逻辑不需要 DSH type，就应放在 host-neutral 层。
 
 ### Provider-native continuation
 
@@ -143,29 +178,37 @@ shiguredo   shiguredo/deepseek-harness
 
 本阶段不新增 abstraction。
 
-#### Phase 2 — Claude Code continuation
+#### Phase 2 — Host-neutral runtime-core spike
+
+在深入修改 DSH provider lifecycle 前，先实现最小的 DSH-independent control contract，用于 create、resume、send 与 interrupt external provider-native session。
+
+该 core 不加入 persistence、mailbox、scheduler 或 workflow semantics。它的目标是复用 provider control，而不是替代 DSH runtime。
+
+同时用 Claude Code 与 Codex feasibility probe 来塑造 contract。
+
+#### Phase 3 — Claude Code continuation
 
 调查当前 Claude Code provider 与 Agent SDK 的 session semantics。
 
 让 provider 保存并恢复 native session identity，使多次消息到达同一 Claude Code conversation。支持 main-to-child send、child-to-main message/report bridge、interrupt、settle 与 cold resume。
 
-#### Phase 3 — Codex continuation
+#### Phase 4 — Codex continuation
 
 使用 app-server protocol 与其 native thread/session identity，把相同 contract 实现到 Codex provider。继续使用既有 ChatGPT/Codex authentication，不引入平行 API-key 路径。
 
-#### Phase 4 — Extract the generic external-continuation seam
+#### Phase 5 — Extract the generic external-continuation seam
 
-仅在 Claude Code 与 Codex 都完成后，才提取共同 lifecycle，形成通用 DSH capability / provider seam。不要基于单一 provider 提前设计 abstraction。
+仅在 Claude Code 与 Codex 都完成后，才稳定 host-neutral runtime-core contract，并把剩余 DSH-specific common lifecycle 提取为通用 DSH capability / provider seam。不要基于单一 provider 提前设计 abstraction。
 
-任何 core addition 都应 provider-neutral，并适合提交 upstream。
+即使 runtime core 初期物理上位于 DSH monorepo 内，也应保持可独立打包并在仓库外使用。任何 DSH core addition 都应 provider-neutral，并适合提交 upstream。
 
-#### Phase 5 — Main-child messaging parity
+#### Phase 6 — Main-child messaging parity
 
 确保三种 provider 都具备等价的 main-to-child messaging、child-to-main conversational messaging、explicit report、inspect 与 interrupt。
 
 除非出现具体 workflow 需求，否则 child-to-child 直接通信保持 out of scope。
 
-#### Phase 6 — dev-skills migration
+#### Phase 7 — dev-skills migration
 
 渐进式集成 `dev-skills`：
 
@@ -177,6 +220,14 @@ shiguredo   shiguredo/deepseek-harness
 6. 只有在等价性被验证后，才删除 `dev-skills` 中对应 runtime。
 
 `dev-skills` 继续拥有 Development Loop、Goal/Profile/Capability semantics、role definition、task decomposition、acceptance、evidence、retry、routing 与 completion policy。
+
+### Packaging and repository boundary
+
+初期把 host-neutral runtime core 物理放在本 monorepo 内，使其 API 能与 DSH integration 和 contract test 一起演进。但需要强制 dependency rule：可复用 core 不得 import DSH/Cordis package。
+
+当 Claude Code 与 Codex 都使用该 core，并且至少出现一个明确的非 DSH consumer 后，可以把 package 移到独立 repository，且无需修改 public contract。
+
+DSH plugin/adapter 可以同时依赖 DSH 与 runtime core；runtime core 绝不能反向依赖 DSH。
 
 ### Sandbox and execution environment
 
@@ -194,7 +245,7 @@ Shiguredo fork 可作为 secondary integration source，引入日文 locale、wo
 
 ## Alternatives considered
 
-**继续把 `agent-harness` 作为 DSH 外部 wrapper repository。** 拒绝。目标能力直接涉及 DSH Session、subagent、provider、inbox 与 activation lifecycle；wrapper 会重复 identifier、projection、provider registry 与 adapter，却没有产生有意义的隔离。
+**继续把 `agent-harness` 作为 DSH 外部的完整 wrapper runtime。** 拒绝。DSH 必须继续 authoritative 地拥有 Session、inbox、report、persistence 与 activation lifecycle。但采用更小的 host-neutral provider-control core，使 Claude/Codex native continuation 逻辑可以在 DSH 外复用，而不重复 DSH runtime。
 
 **继续在 `dev-skills` 中维护 subsession 与 communication runtime。** 拒绝。spawn、process lifetime、provider-native resume、transport、interrupt 与 session persistence 都属于通用 runtime mechanism，而不是 software-development policy。
 
@@ -216,13 +267,17 @@ Shiguredo fork 可作为 secondary integration source，引入日文 locale、wo
 - provider-native session identifier 与 credential 不泄露到 `dev-skills` workflow policy。
 - E2E 流程 Claude implementer -> Codex reviewer -> feedback -> resume same Claude implementer -> re-review 成功。
 - 只有在 parity 被证明后，`dev-skills` 才删除等价的 subsession lifecycle 与 communication transport。
-- generic core change 与 provider-specific code 分离，并适合 upstream review。
+- Claude/Codex 的 provider-native control logic 通过 DSH-independent runtime-core contract 实现。
+- runtime core 不依赖 DSH/Cordis，并且可以在不重新设计的情况下从 monorepo 中独立打包。
+- DSH 继续 authoritative 地拥有 logical child lifetime、persistence、inbox、report 与 event log。
+- generic DSH core change 与 provider-specific code 分离，并适合 upstream review。
 
 ## Risks
 
 - Claude Code 或 Codex 可能没有暴露足够稳定的 native-session control，无法完全满足 DSH continuation contract；若无法达到 parity，provider capability 必须显式表达。
 - upstream DSH 仍处于 developer preview，subagent/session seam 可能快速变化，从而增加 merge 与维护成本。
 - fork 可能逐渐累积 distribution-specific behavior，导致难以上游化；core patch 必须保持通用且最小。
+- host-neutral core 可能不小心膨胀为第二套 harness runtime；它必须严格限制在 provider control 与 capability description，把 persistence、scheduling、durable messaging 与 workflow policy 留给 host。
 - main-centered messaging 有意形成中心化瓶颈，第一版不支持 child-to-child 直接协同。
 - provider-native session continuity 不代表 workspace continuity；后续 execution-world 工作必须把两者作为独立保证。
 - 如果过早把 runtime 责任从 `dev-skills` 删除，可能造成 workflow correctness 回归，因此 migration 必须由 contract 驱动，并在 parity 未证明前保持可回退。
