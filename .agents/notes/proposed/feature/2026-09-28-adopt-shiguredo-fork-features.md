@@ -6,19 +6,19 @@ English | [中文](2026-09-28-adopt-shiguredo-fork-features.zh.md)
 
 ## Problem
 
-This fork of `deepseek-ai/deepseek-harness` carries two local documentation commits on top of upstream release 0.1.6-alpha.2 (commit `ddefc45fbc`, PR #4469), while the downstream Shiguredo fork (`shiguredo/deepseek-harness`) has already rebased four Japanese-first improvements onto upstream master and published them as one commit:
+This fork of `deepseek-ai/deepseek-harness` carries two local documentation commits on top of upstream release 0.1.6-alpha.2 (PR #4469), while the downstream Shiguredo fork (`shiguredo/deepseek-harness`) has already rebased four Japanese-first improvements onto upstream master and published them as one commit:
 
-- `5539e6f1cb` *日本語ロケールとフォント設定とブランチチップをプラグインとして追加する*.
+- *日本語ロケールとフォント設定とブランチチップをプラグインとして追加する*.
 
 The four features are a `ja` language pack, a user-selectable font family, a host-side git checkout resolver with a composer git-branch chip, and an owning-Workspace label on flat Session rows. The fork currently has none of them, and the [cross-provider continuable subagents proposal](2026-09-18-cross-provider-continuable-subagents.md) only mentions the Shiguredo fork as a secondary integration source without a plan for taking its work.
 
-The Shiguredo commit's parent is upstream master `21638c5631` (PR #5282), so its changes assume the 0.1.7 line: language-pack registration, the `Config` plus configuration-form setting model, the composer session-stats row's lead seat, and the current `ui-workspace` projections. Taking the features without first moving this fork's base would force each plugin to be reimplemented against 0.1.6 seams, and would immediately diverge from the upstream design the Shiguredo notes record.
+The Shiguredo commit's parent is upstream master at PR #5282, so its changes assume the 0.1.7 line: language-pack registration, the `Config` plus configuration-form setting model, the composer session-stats row's lead seat, and the current `ui-workspace` projections. Taking the features without first moving this fork's base would force each plugin to be reimplemented against 0.1.6 seams, and would immediately diverge from the upstream design the Shiguredo notes record.
 
 ## Proposal
 
 ### Base update
 
-Advance this fork's `master` to upstream master `21638c5631` by merging `upstream/master` into it, preserving the two local Agent Note documentation commits (`b34806a627`, `b73c981368`). The merged base is the same revision the Shiguredo feature commit was authored against, so the feature lands without a compatibility rewrite.
+Advance this fork's `master` to upstream master at PR #5282 by merging `upstream/master` into it, preserving the two local Agent Note documentation commits. The merged base is the same revision the Shiguredo feature commit was authored against, so the feature lands without a compatibility rewrite.
 
 The fork's remotes are:
 
@@ -45,7 +45,7 @@ The Shiguredo feature commit is a normal contribution to the harness plugin rost
 
 **Reimplement the four features against the 0.1.6 base.** Rejected: the language-pack mechanism exists in 0.1.6, but the configuration-form setting model, the composer stats lead seat, and the current workspace projections do not, so each plugin would need a second design that the upstream sync immediately invalidates. The chosen base update makes the upstream design applicable as written.
 
-**Cherry-pick the feature commit without updating the base.** Rejected: the commit's parent is upstream master `21638c5631`; applying it to a base hundreds of commits behind produces conflicts across shared files (`ui-chat`, `ui-workspace`, bundle configuration, catalogs) and silently assumes APIs the base lacks.
+**Cherry-pick the feature commit without updating the base.** Rejected: the commit's parent is upstream master at PR #5282; applying it to a base hundreds of commits behind produces conflicts across shared files (`ui-chat`, `ui-workspace`, bundle configuration, catalogs) and silently assumes APIs the base lacks.
 
 **Depend on the Shiguredo fork at runtime.** Rejected: the four plugins are ordinary harness packages, not an external service; a runtime dependency would make a downstream fork authoritative over this repository's composition.
 
@@ -55,7 +55,7 @@ The Shiguredo feature commit is a normal contribution to the harness plugin rost
 
 ## Acceptance criteria
 
-- `master` is a descendant of upstream master `21638c5631` and still carries the two local Agent Note documentation commits.
+- `master` is a descendant of upstream master at PR #5282 and still carries the two local Agent Note documentation commits.
 - The Shiguredo feature commit's changes are present in the tree, with its three implemented Agent Notes retained.
 - `pnpm run typecheck`, focused unit tests for the four packages, and the Agent Note gates pass on the merged tree.
 - The `settings-chrome` and `desktop-locale` web e2e expectations, the client slot/api catalogs, and the config catalog match the adopted code.
@@ -65,7 +65,7 @@ The Shiguredo feature commit is a normal contribution to the harness plugin rost
 ## Risks
 
 - The upstream merge touches thousands of files; a conflict in a shared file (`ui-chat`, `ui-workspace`, bundle roster) could silently drop either side, so the merge must be reviewed against unrelated local changes, and the two local documentation commits must survive.
-- The Shiguredo feature commit was authored against `21638c5631`; if upstream master advances while this proposal is reviewed, the feature application acquires conflicts and must be rebased or re-verified.
+- The Shiguredo feature commit was authored against upstream master at PR #5282; if upstream master advances while this proposal is reviewed, the feature application acquires conflicts and must be rebased or re-verified.
 - The `ja` pack is complete only for the namespaces it covers; later upstream key changes break the pack build until translated, which is the intended maintenance pressure but is real work.
 - The git-branch chip spawns `git` on a 15-second poll while a page is visible; a slow or hanging `git` is bounded only by the configured `timeoutMs`.
 - A user-specified font family applies to code as well as UI text, so a proportional family makes code proportional until cleared.

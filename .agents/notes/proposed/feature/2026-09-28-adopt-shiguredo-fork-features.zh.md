@@ -6,19 +6,19 @@ Status: proposed
 
 ## Problem
 
-本仓库是 `deepseek-ai/deepseek-harness` 的 fork，在上游 0.1.6-alpha.2 版本（commit `ddefc45fbc`，PR #4469）之上带有两个本地文档 commit；而下游的 Shiguredo fork（`shiguredo/deepseek-harness`）已经把四项日文优先的改进 rebase 到上游 master，并作为一个 commit 发布：
+本仓库是 `deepseek-ai/deepseek-harness` 的 fork，在上游 0.1.6-alpha.2 版本（PR #4469）之上带有两个本地文档 commit；而下游的 Shiguredo fork（`shiguredo/deepseek-harness`）已经把四项日文优先的改进 rebase 到上游 master，并作为一个 commit 发布：
 
-- `5539e6f1cb` *日本語ロケールとフォント設定とブランチチップをプラグインとして追加する*。
+- *日本語ロケールとフォント設定とブランチチップをプラグインとして追加する*。
 
 这四项功能分别是 `ja` 语言包、用户可选的字体族、Host 侧 git checkout 解析与 composer 的 git 分支 chip，以及扁平 Session 行上显示所属 Workspace 的标签。本 fork 目前一项都没有，而[跨 Provider 可持续 Subagent 提案](2026-09-18-cross-provider-continuable-subagents.zh.md)只是把 Shiguredo fork 列为次要集成来源，并未给出取其成果的计划。
 
-Shiguredo commit 的父 commit 是上游 master `21638c5631`（PR #5282），因此其改动假定的是 0.1.7 系列：语言包注册、`Config` 加配置表单的设置模型、composer 会话统计行的 lead 座位，以及当前的 `ui-workspace` 投影。若不先移动本 fork 的 base 就直接取这些功能，每个插件都必须针对 0.1.6 的 seam 重新实现，并且会立刻偏离 Shiguredo notes 所记录的上游设计。
+Shiguredo commit 的父 commit 是上游 master PR #5282，因此其改动假定的是 0.1.7 系列：语言包注册、`Config` 加配置表单的设置模型、composer 会话统计行的 lead 座位，以及当前的 `ui-workspace` 投影。若不先移动本 fork 的 base 就直接取这些功能，每个插件都必须针对 0.1.6 的 seam 重新实现，并且会立刻偏离 Shiguredo notes 所记录的上游设计。
 
 ## Proposal
 
 ### Base 更新
 
-通过把 `upstream/master` 合并进本 fork 的 `master`，将其推进到上游 master `21638c5631`，同时保留两个本地 Agent Note 文档 commit（`b34806a627`、`b73c981368`）。合并后的 base 与 Shiguredo 功能 commit 的编写基准是同一 revision，因此功能可以无需兼容性改写地落地。
+通过把 `upstream/master` 合并进本 fork 的 `master`，将其推进到上游 master PR #5282，同时保留两个本地 Agent Note 文档 commit。合并后的 base 与 Shiguredo 功能 commit 的编写基准是同一 revision，因此功能可以无需兼容性改写地落地。
 
 本 fork 的 remote 为：
 
@@ -45,7 +45,7 @@ Shiguredo 功能 commit 是对 harness 插件 roster 的普通贡献：它新增
 
 **针对 0.1.6 base 重新实现这四项功能。** 已否决：语言包机制在 0.1.6 中就存在，但配置表单设置模型、composer 统计行 lead 座位以及当前的 workspace 投影并不存在，因此每个插件都需要第二套设计，而上游同步会立刻使其失效。选择先更新 base，可以让上游设计按原样适用。
 
-**不更新 base 而直接 cherry-pick 功能 commit。** 已否决：该 commit 的父 commit 是上游 master `21638c5631`；把它应用到落后数百个 commit 的 base 上，会在共享文件（`ui-chat`、`ui-workspace`、bundle 配置、catalog）产生冲突，并悄悄假设 base 并不具备的 API。
+**不更新 base 而直接 cherry-pick 功能 commit。** 已否决：该 commit 的父 commit 是上游 master PR #5282；把它应用到落后数百个 commit 的 base 上，会在共享文件（`ui-chat`、`ui-workspace`、bundle 配置、catalog）产生冲突，并悄悄假设 base 并不具备的 API。
 
 **运行时依赖 Shiguredo fork。** 已否决：这四个插件是普通 harness 包而非外部服务；运行时依赖会让一个下游 fork 对本仓库的 composition 拥有权威。
 
@@ -55,7 +55,7 @@ Shiguredo 功能 commit 是对 harness 插件 roster 的普通贡献：它新增
 
 ## Acceptance criteria
 
-- `master` 是上游 master `21638c5631` 的后代，并且仍然带有两个本地 Agent Note 文档 commit。
+- `master` 是上游 master PR #5282 的后代，并且仍然带有两个本地 Agent Note 文档 commit。
 - Shiguredo 功能 commit 的改动存在于树中，其三份 implemented Agent Note 得到保留。
 - 在合并后的树上，`pnpm run typecheck`、四个包的聚焦单元测试以及 Agent Note 各 gate 通过。
 - `settings-chrome` 与 `desktop-locale` 的 web e2e 预期、client slot/api catalog 以及 config catalog 与所采纳的代码一致。
@@ -65,7 +65,7 @@ Shiguredo 功能 commit 是对 harness 插件 roster 的普通贡献：它新增
 ## Risks
 
 - 上游合并会触及数千个文件；共享文件（`ui-chat`、`ui-workspace`、bundle roster）中的冲突可能悄悄丢掉某一侧，因此必须针对无关本地改动审查该合并，并且两个本地文档 commit 必须存活。
-- Shiguredo 功能 commit 是针对 `21638c5631` 编写的；若在本提案评审期间上游 master 前进，功能应用会产生冲突，需要 rebase 或重新验证。
+- Shiguredo 功能 commit 是针对上游 master PR #5282 编写的；若在本提案评审期间上游 master 前进，功能应用会产生冲突，需要 rebase 或重新验证。
 - `ja` 语言包只对它覆盖的 namespace 完整；之后的上游 key 变更会在完成翻译前使语言包构建失败，这是预期的维护压力，但确实是实际工作量。
 - git 分支 chip 在页面可见时以 15 秒轮询 spawn `git`；慢速或挂起的 `git` 仅由所配置的 `timeoutMs` 约束。
 - 用户指定的字体族会同时应用于代码与 UI 文本，因此比例字体在清空之前会让代码也变为比例字体。
