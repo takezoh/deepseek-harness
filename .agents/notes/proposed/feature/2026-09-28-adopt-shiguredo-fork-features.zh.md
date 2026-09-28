@@ -10,7 +10,7 @@ Status: proposed
 
 - `5539e6f1cb` *日本語ロケールとフォント設定とブランチチップをプラグインとして追加する*。
 
-这四项功能分别是 `ja` 语言包、用户可选的字体族、Host 侧 git checkout 解析与 composer 的 git 分支 chip，以及扁平 Session 行上显示所属 Workspace 的标签。本 fork 目前一项都没有，而[跨 Provider 可持续 Subagent 提案](2026-09-18-cross-provider-continuable-subagents.md)只是把 Shiguredo fork 列为次要集成来源，并未给出取其成果的计划。
+这四项功能分别是 `ja` 语言包、用户可选的字体族、Host 侧 git checkout 解析与 composer 的 git 分支 chip，以及扁平 Session 行上显示所属 Workspace 的标签。本 fork 目前一项都没有，而[跨 Provider 可持续 Subagent 提案](2026-09-18-cross-provider-continuable-subagents.zh.md)只是把 Shiguredo fork 列为次要集成来源，并未给出取其成果的计划。
 
 Shiguredo commit 的父 commit 是上游 master `21638c5631`（PR #5282），因此其改动假定的是 0.1.7 系列：语言包注册、`Config` 加配置表单的设置模型、composer 会话统计行的 lead 座位，以及当前的 `ui-workspace` 投影。若不先移动本 fork 的 base 就直接取这些功能，每个插件都必须针对 0.1.6 的 seam 重新实现，并且会立刻偏离 Shiguredo notes 所记录的上游设计。
 

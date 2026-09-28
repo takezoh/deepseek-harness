@@ -1,6 +1,31 @@
-# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
-# side as of the last confirmed-consistent state. Both languages carry equal authority;
-# after editing either side, bring the other along and re-record with:
+# Bilingual-pair consistency record for 2026-09-28-adopt-shiguredo-fork-features.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/proposed/feature/2026-09-28-adopt-shiguredo-fork-features.md
-2026-09-28-adopt-shiguredo-fork-features.md: e528c882123228ce908371c9186b86bdea794cf8
-2026-09-28-adopt-shiguredo-fork-features.zh.md: 781ab3f15b295b3a886054a65dd9503d0c6bf3b0
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label:
+  en: a0ea3115f3986e30
+  zh: 10b152ebf854d2b9
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/problem:
+  en: a42f7446e4b32453
+  zh: 712ad8cd0f739886
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/proposal:
+  en: 986dd8097aac4d3d
+  zh: 986dd8097aac4d3d
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/proposal/base-update:
+  en: 3a26221f04ad9b2b
+  zh: 7da70be7514cd50a
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/proposal/feature-adoption:
+  en: 9b13b04c17f1e2ba
+  zh: 6815d13a458b6204
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/proposal/integration-boundary:
+  en: 5c05f6c5cbb18fac
+  zh: e48805ddfbf10240
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/alternatives-considered:
+  en: fc4959f71ef873e8
+  zh: 64853d4625e938d8
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/acceptance-criteria:
+  en: e901190a2e370f48
+  zh: bcb8a08bb25cd2da
+/agent-note-adopt-the-shiguredo-fork-s-japanese-ui-font-setting-git-branch-chip-and-flat-workspace-label/risks:
+  en: cec6b18551933ee1
+  zh: bde2f635eb3e1f83

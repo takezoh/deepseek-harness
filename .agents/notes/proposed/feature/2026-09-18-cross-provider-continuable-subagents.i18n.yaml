@@ -1,6 +1,73 @@
-# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
-# side as of the last confirmed-consistent state. Both languages carry equal authority;
-# after editing either side, bring the other along and re-record with:
+# Bilingual-pair consistency record for 2026-09-18-cross-provider-continuable-subagents.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/proposed/feature/2026-09-18-cross-provider-continuable-subagents.md
-2026-09-18-cross-provider-continuable-subagents.md: 1f9e9bfa7f1877a0cedf9d6513d5cccb19b8ffa0
-2026-09-18-cross-provider-continuable-subagents.zh.md: 01613f7c08a9027ebad65819d4d976de8ff6b958
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging:
+  en: 27c18deb86f2d1b7
+  zh: 3f7374cadf5d4c7d
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/problem:
+  en: afd040d66fa85041
+  zh: e68aba9f4cf207df
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal:
+  en: 8b41df7c049809c3
+  zh: beee28533b0016f1
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/runtime-layering:
+  en: f8ad49ac711ca8ec
+  zh: fec1715c34fceb67
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/host-neutral-provider-contract:
+  en: 5f5ea632dcca140c
+  zh: a07894d6328f772a
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/provider-native-continuation:
+  en: d7ae78fc26b59726
+  zh: d5eebf9543793a8c
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/messaging-semantics:
+  en: c0289202fcdee848
+  zh: 168258da1d0eed52
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/golden-contract:
+  en: 8ba5741407026444
+  zh: 78c3e2a100e04f63
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence:
+  en: 6ce032365c748ce3
+  zh: 6ce032365c748ce3
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-0-repository-and-upstream-discipline:
+  en: 126fe4226935f923
+  zh: 6e226f01aec028e3
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-1-establish-the-native-golden-contract:
+  en: ac68e57d94618677
+  zh: 5fe41ae4a29a8538
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-2-host-neutral-runtime-core-spike:
+  en: 1d11fe5e00e06412
+  zh: 361998817061fb53
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-3-claude-code-continuation:
+  en: 212626510ec05424
+  zh: d56da0baaff02aa1
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-4-codex-continuation:
+  en: 04ef0f989b30a40c
+  zh: ef1c314acab075d4
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-5-extract-the-generic-external-continuation-seam:
+  en: 9ae3bc6c8f20b993
+  zh: 6a9392856854013f
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-6-main-child-messaging-parity:
+  en: c3fd3af77bb466d6
+  zh: 2973b41d4e19f55d
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/implementation-sequence/phase-7-dev-skills-migration:
+  en: 290390e9590113fe
+  zh: 3c2afa651de84674
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/packaging-and-repository-boundary:
+  en: 623b185099c8a3b1
+  zh: c2429a23ff337936
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/sandbox-and-execution-environment:
+  en: 46cacdd838bd4915
+  zh: d6d4d2a40dad2068
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/proposal/shiguredo-fork:
+  en: 40bdd8dd9f70c8e1
+  zh: dc96ae953afdf04d
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/alternatives-considered:
+  en: 170f0608fed88e97
+  zh: 46b899438b580fab
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/acceptance-criteria:
+  en: f6b65d911f3b2542
+  zh: 7db4b0df06377f6d
+/agent-note-cross-provider-continuable-subagents-and-main-child-messaging/risks:
+  en: 46f94371730d97f4
+  zh: 103bb1a23ce36a62
